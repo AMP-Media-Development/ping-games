@@ -1,0 +1,10 @@
+# Ping Games — Code Owners
+# All PRs require review from the Ping team
+
+* @AMP-Media-Development/ping-games-reviewers
+
+# Bridge files are critical — extra protection
+_template/Assets/Scripts/PingBridge.cs @AMP-Media-Development/ping-games-reviewers
+_template/Assets/Plugins/WebGL/PingBridgePlugin.jslib @AMP-Media-Development/ping-games-reviewers
+_template-html5/ping-bridge.js @AMP-Media-Development/ping-games-reviewers
+.github/ @AMP-Media-Development/ping-games-reviewers

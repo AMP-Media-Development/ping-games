@@ -1,0 +1,138 @@
+name: Deploy Games to Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify bridge files are canonical
+        run: |
+          for game_dir in games/*/; do
+            game=$(basename "$game_dir")
+
+            # Unity games: check PingBridge.cs and PingBridgePlugin.jslib
+            if [ -f "$game_dir/Assets/Scripts/PingBridge.cs" ]; then
+              diff "$game_dir/Assets/Scripts/PingBridge.cs" _template/Assets/Scripts/PingBridge.cs \
+                || (echo "ERROR: $game PingBridge.cs has been modified!" && exit 1)
+            fi
+            if [ -f "$game_dir/Assets/Plugins/WebGL/PingBridgePlugin.jslib" ]; then
+              diff "$game_dir/Assets/Plugins/WebGL/PingBridgePlugin.jslib" _template/Assets/Plugins/WebGL/PingBridgePlugin.jslib \
+                || (echo "ERROR: $game PingBridgePlugin.jslib has been modified!" && exit 1)
+            fi
+
+            # HTML5 games: check ping-bridge.js
+            if [ -f "$game_dir/ping-bridge.js" ]; then
+              diff "$game_dir/ping-bridge.js" _template-html5/ping-bridge.js \
+                || (echo "ERROR: $game ping-bridge.js has been modified!" && exit 1)
+            fi
+          done
+          echo "All bridge files are canonical"
+
+      - name: Verify game outputs exist
+        run: |
+          for game_dir in games/*/; do
+            game=$(basename "$game_dir")
+
+            # Unity games: check Build/ directory
+            if [ -d "$game_dir/Build" ]; then
+              test -f "$game_dir/Build/WebGLBuild.loader.js" || (echo "Missing loader for $game" && exit 1)
+              test -f "$game_dir/Build/WebGLBuild.wasm" || (echo "Missing wasm for $game" && exit 1)
+              echo "Unity build verified: $game"
+            fi
+
+            # All games: check index.html
+            if [ -f "$game_dir/index.html" ]; then
+              echo "Entry point verified: $game"
+            else
+              echo "WARNING: No index.html for $game"
+            fi
+          done
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble deploy directory
+        run: |
+          mkdir -p _site
+          for game_dir in games/*/; do
+            game=$(basename "$game_dir")
+            mkdir -p "_site/$game"
+
+            # Unity games: copy Build/ directory
+            if [ -d "$game_dir/Build" ]; then
+              cp -r "$game_dir/Build" "_site/$game/Build"
+            fi
+
+            # Copy index.html (both Unity and HTML5)
+            if [ -f "$game_dir/index.html" ]; then
+              cp "$game_dir/index.html" "_site/$game/index.html"
+            fi
+
+            # HTML5 games: copy JS/CSS assets
+            for ext in js css; do
+              for f in "$game_dir"/*.$ext; do
+                [ -f "$f" ] && cp "$f" "_site/$game/"
+              done
+            done
+
+            # HTML5 games: copy assets/ directory if present
+            if [ -d "$game_dir/assets" ]; then
+              cp -r "$game_dir/assets" "_site/$game/assets"
+            fi
+          done
+
+          # Root index listing all games
+          cat > _site/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <title>Ping Games</title>
+            <style>
+              body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; background: #0a0a0f; color: #e0e0e0; }
+              h1 { color: #0DBD8B; }
+              a { color: #0DBD8B; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+              ul { list-style: none; padding: 0; }
+              li { padding: 8px 0; border-bottom: 1px solid #222; }
+            </style>
+          </head>
+          <body>
+            <h1>Ping Games</h1>
+            <p>Multiplayer games for the <a href="https://ping.live">Ping</a> chat platform.</p>
+            <ul>
+          HTMLEOF
+          for game_dir in games/*/; do
+            game=$(basename "$game_dir")
+            echo "      <li><a href=\"$game/\">$game</a></li>" >> _site/index.html
+          done
+          cat >> _site/index.html << 'HTMLEOF'
+            </ul>
+            <p><a href="https://github.com/AMP-Media-Development/ping-games">Source on GitHub</a></p>
+          </body>
+          </html>
+          HTMLEOF
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

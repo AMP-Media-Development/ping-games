@@ -1,0 +1,13 @@
+/* Game-specific styles — customize for your game */
+
+#game-container {
+    padding: 16px;
+    gap: 12px;
+}
+
+#game-canvas {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    border-radius: 8px;
+}

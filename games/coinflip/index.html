@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>Ping — Flip A Coin</title>
+  <link rel="stylesheet" href="game.css">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="coin-canvas"></canvas>
+
+    <div id="status-text">Choose heads or tails to start!</div>
+
+    <div id="controls">
+      <div id="choices">
+        <button class="choice-btn" id="btn-heads" onclick="chooseHeadsOrTails('heads')">
+          <svg width="60" height="60" viewBox="0 0 100 100">
+            <defs><linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#FFC107"/><stop offset="100%" stop-color="#B8860B"/></linearGradient></defs>
+            <circle cx="50" cy="50" r="46" fill="url(#hg)"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#B8860B" stroke-width="2"/>
+            <g transform="translate(50,48)"><path d="M-20 5 L-15-15 L-8-5 L0-20 L8-5 L15-15 L20 5Z" fill="#B8860B" stroke="#8B6914" stroke-width="1"/><circle cx="-15" cy="-15" r="3" fill="#FFE4B5"/><circle cx="0" cy="-20" r="3" fill="#FFE4B5"/><circle cx="15" cy="-15" r="3" fill="#FFE4B5"/><rect x="-20" y="5" width="40" height="8" fill="#B8860B" stroke="#8B6914" stroke-width="1"/></g>
+            <text x="50" y="82" text-anchor="middle" font-size="10" fill="#8B6914" font-weight="bold">HEADS</text>
+          </svg>
+          <span>Heads</span>
+        </button>
+        <button class="choice-btn" id="btn-tails" onclick="chooseHeadsOrTails('tails')">
+          <svg width="60" height="60" viewBox="0 0 100 100">
+            <defs><linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFD700"/><stop offset="50%" stop-color="#FFC107"/><stop offset="100%" stop-color="#B8860B"/></linearGradient></defs>
+            <circle cx="50" cy="50" r="46" fill="url(#tg)"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#B8860B" stroke-width="2"/>
+            <g transform="translate(50,45)"><path d="M0-15C-5-18-15-15-20-5C-18-8-10-10-5-8L-8 0C-12 5-15 10-10 15L0 8L10 15C15 10 12 5 8 0L5-8C10-10 18-8 20-5C15-15 5-18 0-15Z" fill="#B8860B" stroke="#8B6914" stroke-width="1"/><circle cx="0" cy="-10" r="2" fill="#8B6914"/></g>
+            <text x="50" y="82" text-anchor="middle" font-size="10" fill="#8B6914" font-weight="bold">TAILS</text>
+          </svg>
+          <span>Tails</span>
+        </button>
+      </div>
+
+      <div id="waiting-container" class="hidden">
+        <div class="spinner"></div>
+        <span class="waiting-text">Opponent will see this challenge in the chat</span>
+      </div>
+
+      <div id="result-container" class="hidden">
+        <div id="result-banner"></div>
+        <div id="choices-summary"></div>
+        <button id="play-again-btn" onclick="playAgain()">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="ping-bridge.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

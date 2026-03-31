@@ -1,0 +1,88 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+#game-container {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 16px; gap: 12px;
+    text-align: center;
+}
+
+/* ---- Canvas ---- */
+
+#coin-canvas {
+    width: 100%; flex: 1; min-height: 0;
+    border-radius: 12px;
+    max-height: 300px;
+}
+
+/* ---- Status ---- */
+
+#status-text {
+    font-size: 15px; color: #737d8c;
+    min-height: 22px; line-height: 1.4;
+}
+#status-text strong { color: #17191c; text-transform: capitalize; }
+.flipping-text { font-size: 18px; font-weight: 600; color: #17191c; animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* ---- Choice buttons ---- */
+
+#controls {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 12px;
+}
+#choices { display: flex; gap: 16px; justify-content: center; }
+
+.choice-btn {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    padding: 20px 30px; border: none;
+    background: #0DBD8B; color: #fff;
+    border-radius: 12px; font-size: 16px;
+    font-weight: 600; cursor: pointer;
+    transition: all 0.2s ease; min-width: 130px;
+}
+.choice-btn svg { transition: transform 0.2s ease; }
+.choice-btn:hover { filter: brightness(0.92); transform: translateY(-3px); box-shadow: 0 6px 16px rgba(13,189,139,0.3); }
+.choice-btn:hover svg { transform: scale(1.1); }
+.choice-btn:active { transform: translateY(0); box-shadow: none; }
+
+/* ---- Waiting ---- */
+
+#waiting-container { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.spinner {
+    width: 32px; height: 32px;
+    border: 3px solid #e0e0e0; border-top-color: #0DBD8B;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.waiting-text { color: #737d8c; font-size: 13px; }
+
+/* ---- Result ---- */
+
+#result-container { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+#result-banner {
+    font-size: 28px; font-weight: 700;
+    padding: 14px 28px; border-radius: 12px;
+    animation: resultSlide 0.5s ease-out;
+}
+@keyframes resultSlide { 0% { transform: translateY(-20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+.banner-won { color: #0DBD8B; background: rgba(13,189,139,0.08); }
+.banner-lost { color: #737d8c; background: rgba(115,125,140,0.08); }
+
+#choices-summary { font-size: 14px; color: #737d8c; line-height: 1.7; }
+#choices-summary strong { color: #17191c; text-transform: capitalize; }
+
+#play-again-btn {
+    padding: 12px 32px; border: none;
+    background: #0DBD8B; color: #fff;
+    border-radius: 10px; font-size: 15px;
+    font-weight: 700; cursor: pointer;
+    transition: all 0.2s ease;
+}
+#play-again-btn:hover { filter: brightness(0.92); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(13,189,139,0.3); }
+
+/* ---- Utility ---- */
+.hidden { display: none !important; }

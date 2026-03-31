@@ -43,6 +43,71 @@
       showBanner: function () {},
     };
 
+    // -----------------------------------------------------------------------
+    // PostMessage Bridge — enables PingGameBridge iframe fallback
+    //
+    // When loaded as an iframe by PingGameBridge, this bridges:
+    //   Unity → Host:  dispatchReactUnityEvent → window.parent.postMessage
+    //   Host → Unity:  window.addEventListener("message") → unityInstance.SendMessage
+    //
+    // When loaded standalone (not in iframe), falls through to normal Unity init.
+    // -----------------------------------------------------------------------
+
+    var isInIframe = (window !== window.parent);
+
+    // Override dispatchReactUnityEvent so PingBridge.cs jslib calls
+    // forward to the parent via postMessage (instead of being lost)
+    if (isInIframe) {
+      window.dispatchReactUnityEvent = function (eventName) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        if (eventName === "GameReady") {
+          window.parent.postMessage({ type: "PING_GAME_READY" }, "*");
+        } else if (eventName === "GameStateUpdate") {
+          try {
+            window.parent.postMessage({
+              type: "PING_GAME_STATE_UPDATE",
+              payload: JSON.parse(args[0])
+            }, "*");
+          } catch (e) {
+            window.parent.postMessage({
+              type: "PING_GAME_STATE_UPDATE",
+              payload: args[0]
+            }, "*");
+          }
+        } else if (eventName === "GameAction") {
+          try {
+            var parsed = JSON.parse(args[0]);
+            window.parent.postMessage({
+              type: "PING_GAME_ACTION",
+              action: parsed.action,
+              payload: parsed.payload || {}
+            }, "*");
+          } catch (e) {
+            console.warn("[PongBridge] Failed to parse GameAction:", e);
+          }
+        }
+      };
+
+      // Listen for messages from PingGameBridge (host → game)
+      window.addEventListener("message", function (event) {
+        if (!event.data || !event.data.type) return;
+        if (!window.unityInstance) return;
+
+        if (event.data.type === "PING_GAME_INIT") {
+          var payload = event.data.payload || {};
+          window.unityInstance.SendMessage("PingBridge", "OnInit", JSON.stringify({
+            userId: payload.userId || "",
+            gameId: payload.gameId || "",
+            roomId: payload.roomId || "",
+            state: payload.state ? (typeof payload.state === "string" ? payload.state : JSON.stringify(payload.state)) : ""
+          }));
+        } else if (event.data.type === "PING_GAME_STATE_SYNC") {
+          var statePayload = event.data.payload || {};
+          window.unityInstance.SendMessage("PingBridge", "OnStateSync", JSON.stringify(statePayload));
+        }
+      });
+    }
+
     var script = document.createElement("script");
     script.src = loaderUrl;
     script.onload = function () {
@@ -53,6 +118,12 @@
         if (cover) {
           cover.classList.add('hidden');
           setTimeout(function () { cover.remove(); }, 500);
+        }
+
+        // If in iframe and dispatchReactUnityEvent was already called before
+        // unityInstance was ready (race condition), re-send GameReady now
+        if (isInIframe) {
+          window.parent.postMessage({ type: "PING_GAME_READY" }, "*");
         }
       }).catch(function (message) {
         console.error("[PingPong] Unity init failed:", message);

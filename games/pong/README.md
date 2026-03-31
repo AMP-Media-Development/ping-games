@@ -1,6 +1,6 @@
 # Pong
 
-Classic Pong — multiplayer via Ping state sync.
+Classic Pong — multiplayer via Ping with WebRTC peer-to-peer real-time sync.
 
 ## Controls
 
@@ -11,6 +11,13 @@ Classic Pong — multiplayer via Ping state sync.
 
 - **Multiplayer** — challenge another player in the room
 - **vs AI** — play against the computer
+
+## Multiplayer Architecture
+
+- **Real-time sync**: WebRTC data channel (P2P, ~5-30ms latency, 30Hz)
+- **Fallback**: Matrix timeline events (10Hz) when WebRTC can't connect
+- **Host authority**: Host player simulates ball physics, guest uses client-side prediction with smooth correction
+- **Signaling**: SDP offer/answer exchanged via Matrix timeline events (one-time setup)
 
 ## Build
 

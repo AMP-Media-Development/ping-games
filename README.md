@@ -9,7 +9,7 @@ Your Game  <──  PingBridge  ──>  Ping Room
 (Unity/HTML5)   (protocol)       (state sync)
 ```
 
-Games are built as **Unity WebGL** or **HTML5** projects. The **PingBridge** protocol handles all communication between your game and the Ping host — you never make network requests directly.
+Games are built as **Unity WebGL** or **HTML5** projects. The **PingBridge** protocol handles all communication between your game and the Ping host — you never make network requests directly. Multiplayer games automatically use **WebRTC data channels** for peer-to-peer real-time sync (~5-30ms latency), with Matrix timeline events as fallback.
 
 Built games are hosted on **GitHub Pages** and loaded by Ping-web via CDN URLs.
 
@@ -42,10 +42,10 @@ Both templates include **PingBridge** pre-configured. The bridge handles all net
 
 ## Games
 
-| Game | Type | Status |
-|------|------|--------|
-| [Pong](games/pong/) | Unity WebGL | Live |
-| [Coin Flip](games/coinflip/) | HTML5 Canvas | Live |
+| Game | Type | Status | Play |
+|------|------|--------|------|
+| [Pong](games/pong/) | Unity WebGL | Live | [Launch](https://AMP-Media-Development.github.io/ping-games/pong/) |
+| [Coin Flip](games/coinflip/) | HTML5 Canvas | Live | [Launch](https://AMP-Media-Development.github.io/ping-games/coinflip/) |
 
 ## Documentation
 

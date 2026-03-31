@@ -15,16 +15,15 @@ Build multiplayer games for the [Ping](https://ping.live) chat platform. Games c
 │    or iframe)    │   GameStateUpdate             │                  │
 └──────────────────┘   OnInit / OnStateSync        └────────┬─────────┘
                                                             │
-                                              ┌─────────────┼────────────┐
-                                              │             │            │
-                                         State Events  Timeline Evts  Cache API
-                                         (durable,     (fast, chat    (CDN assets
-                                          rejoin)       messages)      cached)
-                                              │             │            │
-                                              └─────────────┼────────────┘
-                                                            │
-                                                   ┌────────▼─────────┐
-                                                   │    Ping Room     │
+                                         ┌──────────────────┼──────────────────┐
+                                         │                  │                  │
+                                    WebRTC P2P        Timeline Evts       Cache API
+                                    DataChannel       (signaling,         (CDN assets
+                                    (real-time,        actions,            cached)
+                                     primary)          fallback)
+                                         │                  │                  │
+                                         │         ┌────────▼─────────┐       │
+                                    [direct P2P]   │    Ping Room     │       │
                                                    └──────────────────┘
 ```
 
@@ -93,6 +92,39 @@ PingBridge handles all communication between your game and the Ping host. Your g
 - Use `SendAction()` only for **user-visible** events (game_invite, game_started, game_over, restart)
 - Do NOT call every frame — each call creates a chat message
 - Payload: `{"action": "game_over", "payload": {"winner": "left", "score": 5}}`
+
+---
+
+## Real-Time Transport: WebRTC Data Channels
+
+For multiplayer games that send frequent state updates (e.g. Pong at 30Hz), PingGameBridge automatically establishes a **peer-to-peer WebRTC data channel** between players. This is entirely transparent to your game — you still call `SendStateUpdate()` and receive `OnStateSync()` the same way.
+
+### How It Works
+
+```
+Without WebRTC (fallback):
+  Game A → PingGameBridge → Matrix Server → PingGameBridge → Game B
+  Latency: ~100-300ms, limited to 10Hz (server throttling)
+
+With WebRTC (automatic):
+  Game A → PingGameBridge → [P2P DataChannel] → PingGameBridge → Game B
+  Latency: ~5-30ms, 30-60Hz capable, zero server load
+```
+
+### Connection Flow
+
+1. Both players open the game → PingGameBridge mounts
+2. Players exchange WebRTC signaling (SDP offer/answer + ICE candidates) via Matrix timeline events
+3. The player with the lexicographically smaller user ID creates the offer (deterministic, avoids glare)
+4. Once connected, all `GameStateUpdate` data flows over the P2P data channel
+5. Falls back to timeline events automatically if WebRTC can't connect (firewalls, symmetric NAT)
+
+### What Games Need to Know
+
+- **Nothing changes for your game code.** The transport layer is handled by PingGameBridge.
+- Games that send state at 30Hz+ benefit the most (the bridge throttles to 10Hz for timeline fallback, but passes through at full rate over WebRTC).
+- The existing TURN/STUN servers from Ping's call infrastructure are reused for NAT traversal.
+- The data channel is only active during gameplay — no persistent connections.
 
 ---
 

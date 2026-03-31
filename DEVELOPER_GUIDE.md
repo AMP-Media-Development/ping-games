@@ -1,12 +1,12 @@
 # Ping Games — Developer Guide
 
-Build multiplayer games for the [Ping](https://ping.live) chat platform. Games connect to Matrix rooms for real-time state synchronization, allowing players to challenge each other directly from chat.
+Build multiplayer games for the [Ping](https://ping.live) chat platform. Games connect to Ping rooms for real-time state synchronization, allowing players to challenge each other directly from chat.
 
 ---
 
 ## Architecture
 
-### How Games Connect to Matrix
+### How Games Connect to Ping
 
 ```
 ┌──────────────────┐      react-unity-webgl       ┌──────────────────┐
@@ -24,7 +24,7 @@ Build multiplayer games for the [Ping](https://ping.live) chat platform. Games c
                                               └─────────────┼────────────┘
                                                             │
                                                    ┌────────▼─────────┐
-                                                   │   Matrix Room    │
+                                                   │    Ping Room     │
                                                    └──────────────────┘
 ```
 
@@ -36,7 +36,7 @@ There are **three ways** to build a game for Ping:
 |------|----------|--------|----------|---------|
 | **Unity WebGL** | `_template/` | `PingBridge.cs` (C#) | Rich 2D/3D games | Pong |
 | **HTML5 / iframe** | `_template-html5/` | `ping-bridge.js` (JS) | Canvas/JS games, Phaser, Three.js | Any web game |
-| **Direct Canvas** | *(built into Ping-web)* | Direct Matrix API | Simple first-party games | Coin Flip |
+| **Direct Canvas** | *(built into Ping-web)* | Direct Ping API | Simple first-party games | Coin Flip |
 
 **Unity** and **HTML5** games live in this repo and deploy to CDN. **Direct Canvas** games are TypeScript components built directly into Ping-web (no CDN, no iframe, no bridge overhead) — these are for first-party games maintained by the Ping team.
 
@@ -72,9 +72,9 @@ PingBridge handles all communication between your game and the Ping host. Your g
 
 ```json
 {
-  "userId": "@alice:matrix.ping.live",
+  "userId": "@alice:ping.live",
   "gameId": "uuid-of-session",
-  "roomId": "!room:matrix.ping.live",
+  "roomId": "!room:ping.live",
   "state": "{...}"
 }
 ```
@@ -83,10 +83,10 @@ PingBridge handles all communication between your game and the Ping host. Your g
 
 ### State Rules
 
-- Payloads must be under **64KB** (Matrix state event limit)
+- Payloads must be under **64KB** (state event limit)
 - State should be a **complete snapshot**, not a diff
 - Include a **timestamp** for ordering
-- Use **Matrix user IDs** (`@user:server`) for player references
+- Use **Ping user IDs** (`@user:server`) for player references
 
 ### Action Rules
 

@@ -29,7 +29,7 @@ Thanks for your interest in building games for Ping! This guide covers everythin
 - Send `SendStateUpdate()` for all state changes
 - Send `SendAction()` only for user-visible events (game start, game over, scores)
 - Keep state payloads under **64KB**
-- Use Matrix user IDs (`@user:server`) for player identification
+- Use Ping user IDs (`@user:server`) for player identification
 - Include an **EventSystem** in your scene (for UI button support)
 - Test both single-player and multiplayer flows
 - Generate sprites/audio procedurally when possible (keeps build size small)
@@ -87,7 +87,7 @@ Brief description of the game.
 
 1. CI validates bridge files and build outputs
 2. Ping team reviews code and plays the game
-3. Internal testing in a real Matrix room
+3. Internal testing in a real Ping room
 4. Feedback / approval
 5. Merge → auto-deploy to GitHub Pages CDN
 

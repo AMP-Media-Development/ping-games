@@ -1,6 +1,6 @@
 # Pong
 
-Classic Pong — multiplayer via Matrix state sync.
+Classic Pong — multiplayer via Ping state sync.
 
 ## Controls
 

@@ -36,12 +36,12 @@ coinflip/
 {
   "game_id": "uuid",
   "phase": "idle | waiting | finished",
-  "challenger": "@alice:matrix.ping.live",
+  "challenger": "@alice:ping.live",
   "challenger_choice": "heads",
-  "challenged": "@bob:matrix.ping.live",
+  "challenged": "@bob:ping.live",
   "challenged_choice": "tails",
   "result": "heads",
-  "winner": "@alice:matrix.ping.live",
+  "winner": "@alice:ping.live",
   "timestamp": 1711900000000
 }
 ```

@@ -2,7 +2,7 @@
  * Flip A Coin — Multiplayer coin flip game for Ping.
  *
  * Canvas-rendered coin with 60fps animation.
- * Uses PingBridge (postMessage) for Matrix state sync.
+ * Uses PingBridge (postMessage) for Ping state sync.
  */
 
 // ---- Constants ----

@@ -84,7 +84,7 @@ public class PingBridge : MonoBehaviour
     }
 
     /// <summary>
-    /// Send a state update to all players via Matrix state event.
+    /// Send a state update to all players via Ping state sync.
     /// Pass any serializable object — it will be JSON-serialized.
     /// </summary>
     public void SendStateUpdate<T>(T state)

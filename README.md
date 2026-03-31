@@ -1,11 +1,11 @@
 # Ping Games
 
-Open-source multiplayer games for the [Ping](https://ping.live) chat platform. Games connect to Matrix rooms for real-time state synchronization, allowing players to challenge each other directly from chat.
+Open-source multiplayer games for the [Ping](https://ping.live) chat platform. Games connect to Ping rooms for real-time state synchronization, allowing players to challenge each other directly from chat.
 
 ## How It Works
 
 ```
-Your Game  <──  PingBridge  ──>  Matrix Room
+Your Game  <──  PingBridge  ──>  Ping Room
 (Unity/HTML5)   (protocol)       (state sync)
 ```
 
@@ -38,7 +38,7 @@ cp -r _template-html5 games/my-game-name
 | **[`_template/`](_template/)** | Rich 2D/3D games | Unity WebGL + C# |
 | **[`_template-html5/`](_template-html5/)** | Simple/canvas games | Vanilla JS/HTML5 |
 
-Both templates include **PingBridge** pre-configured. The bridge handles all Matrix communication — your game just calls `sendStateUpdate()` and `sendAction()`.
+Both templates include **PingBridge** pre-configured. The bridge handles all network communication — your game just calls `sendStateUpdate()` and `sendAction()`.
 
 ## Games
 

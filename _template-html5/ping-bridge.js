@@ -33,7 +33,7 @@
         },
 
         /**
-         * Send a state update to all players via Matrix state event.
+         * Send a state update to all players via Ping state sync.
          * @param {object} state - Complete game state snapshot (must be under 64KB)
          */
         sendStateUpdate: function (state) {

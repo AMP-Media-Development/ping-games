@@ -1,4 +1,4 @@
-name: Deploy Games to Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -68,9 +68,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build docs site
+        run: |
+          cd docs-site
+          npm install
+          npm run build
+
       - name: Assemble deploy directory
         run: |
           mkdir -p _site
+
+          # Docs site occupies the root
+          cp -r docs-site/dist/* _site/
+
+          # Prevent GitHub Pages from running Jekyll
+          touch _site/.nojekyll
+
+          # Games in subdirectories (existing CDN URLs unchanged)
           for game_dir in games/*/; do
             game=$(basename "$game_dir")
             mkdir -p "_site/$game"
@@ -97,38 +115,6 @@ jobs:
               cp -r "$game_dir/assets" "_site/$game/assets"
             fi
           done
-
-          # Root index listing all games
-          cat > _site/index.html << 'HTMLEOF'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <title>Ping Games</title>
-            <style>
-              body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; background: #0a0a0f; color: #e0e0e0; }
-              h1 { color: #0DBD8B; }
-              a { color: #0DBD8B; text-decoration: none; }
-              a:hover { text-decoration: underline; }
-              ul { list-style: none; padding: 0; }
-              li { padding: 8px 0; border-bottom: 1px solid #222; }
-            </style>
-          </head>
-          <body>
-            <h1>Ping Games</h1>
-            <p>Multiplayer games for the <a href="https://ping.live">Ping</a> chat platform.</p>
-            <ul>
-          HTMLEOF
-          for game_dir in games/*/; do
-            game=$(basename "$game_dir")
-            echo "      <li><a href=\"$game/\">$game</a></li>" >> _site/index.html
-          done
-          cat >> _site/index.html << 'HTMLEOF'
-            </ul>
-            <p><a href="https://github.com/AMP-Media-Development/ping-games">Source on GitHub</a></p>
-          </body>
-          </html>
-          HTMLEOF
 
       - uses: actions/upload-pages-artifact@v3
         with:
